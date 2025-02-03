@@ -72,7 +72,6 @@ internal class Program
         Console.Write(apple);
         Console.ForegroundColor = ConsoleColor.White;
     }
-
     static void VENSTRE(List<int> x_pos, List<int> y_pos)
     {
         if (y_pos == null || y_pos.Count == 0)
@@ -88,7 +87,6 @@ internal class Program
         // Fjern det sidste element
         y_pos.RemoveAt(y_pos.Count - 1);
     }
-
     static void HØJRE(List<int> x_pos, List<int> y_pos)
     {
         if (y_pos == null || y_pos.Count == 0)
@@ -136,7 +134,6 @@ internal class Program
         y_pos.RemoveAt(y_pos.Count - 1);
 
     }
-
     static bool Alive(List<int> x_pos, List<int> y_pos, int size, int score)
     {
         //Kontrollere spillets bander
@@ -185,45 +182,81 @@ internal class Program
         return true;    //Slangen er stadig i live hvis ingen dødsbetingelser er opfyldt. 
 
     }
-    static void Spis(List<int> x_pos, List<int> y_pos, int æble_x, int æble_y, int score)
+    static void Spis(List<int> x_pos, List<int> y_pos, ref int æble_x, ref int æble_y, ref int score, int size, ref int hastighed)
     {
         Random rand = new Random();
-        if (x_pos[0] == æble_x && y_pos[0] == æble_y)                   // Her har jeg ændret - Mark
+
+        if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x + 1 && y_pos[0] == æble_y))                   // Her har jeg ændret - Mark
         {
             x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
             y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
             score = score + 100;                                        // Her har jeg ændret - Mark
 
+            using (var soundPlayer = new SoundPlayer(@"C:\Users\victo\Downloads\smW_coin.wav"))
+            {
+                soundPlayer.Play(); // can also use soundPlayer.PlaySync()
+            }
+            hastighed = hastighed *9/10;
             //slet æble her
             Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
             Console.Write(" ");
-            æble_x = 10;                                  // Her har jeg ændret - Mark
-            æble_y = 10;                                  // Her har jeg ændret - Mark
+            æble_x = rand.Next(4, size-2);                                  // Her har jeg ændret - Mark
+            æble_y = rand.Next(4, size / 4 -2);                             // Her har jeg ændret - Mark
+            while (true)
+            {
+                for (int i = 0; i < x_pos.Count; i++)
+                {
+                    if ((x_pos[i] == æble_x && y_pos[i] == æble_y) || (x_pos[i] == æble_x + 1 && y_pos[i] == æble_y))
+                    {
+                        //slet æble her
+                        Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
+                        Console.Write(" ");
+
+                        æble_x = rand.Next(4, size - 2);                                  // Her har jeg ændret - Mark
+                        æble_y = rand.Next(4, size / 4 - 2);
+                                           }
+                    else
+                    {
+                        
+                        return;
+                    }
+                }
+             
+            }
+            
         }
     }
-
+    static void RemoveSnake(List<int> x_pos, List<int> y_pos)
+    {
+        for (int i = 0; i < x_pos.Count; i++)
+        {
+            Console.SetCursorPosition(x_pos[i], y_pos[i]);
+            Console.Write(" ");
+        }
+    }
+   
     private static void Main(string[] args)
     {
+        //Fjerner cursor 
         Console.CursorVisible = false;
 
+        //Definer two lister med koordinater
         List<int> x_pos = new List<int>();
         List<int> y_pos = new List<int>();
+        //random funk. til æble spawn
         Random rand = new Random();
 
+        //Bane størrelse
         int size = 80;
-        int hastighed = 50;// Her har jeg ændret - Mark
-        int æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-        int æble_y = rand.Next(2, size/4);                                  // Her har jeg ændret - Mark
-        int score = 0;                                                  // Her har jeg ændret - Mark
+        int hastighed = 100;
+        int æble_x = rand.Next(4, size - 2);                               
+        int æble_y = rand.Next(4, size/4 - 2);                              
+        int score = 0;                                            
         
 
         //Tegn baggrund
         TegnBane(size);
-       // Console.SetBufferSize(150, 150);
-       // Console.SetWindowSize(150, 50);
-        
-
-
+      
         // start placering
         x_pos.AddRange(new int[] { 33, 34, 35 });
         y_pos.AddRange(new int[] { 10, 10, 10 });
@@ -232,63 +265,37 @@ internal class Program
        
         do
         {
+            //Slangen skal starte med at bevæge sig til venstre
             VENSTRE(x_pos, y_pos);
-            if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x + 1 && y_pos[0] == æble_y))                   // Her har jeg ændret - Mark
-            {
-                x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
-                y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
-                score = score + 100;                                        // Her har jeg ændret - Mark
-
-                //slet æble her
-                Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
-                Console.Write(" ");
-                æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-                æble_y = rand.Next(2, size / 4);                              // Her har jeg ændret - Mark
-            }
+            Spis(x_pos, y_pos, ref æble_x, ref æble_y, ref score, size, ref hastighed);
             if (!Alive(x_pos, y_pos, size, score))
             {
                 return;
             }
             TEGN(x_pos, y_pos, æble_x, æble_y, score);
             Thread.Sleep(hastighed);
-            
+            RemoveSnake(x_pos, y_pos);
 
-            for (int j = 0; j < x_pos.Count; j++)
-            {
-                Console.SetCursorPosition(x_pos[j], y_pos[j]);
-                Console.Write(" ");
-            }
-
-
+            //Hvis en tast bliver trykket så går den ind i case loopet
             if (Console.KeyAvailable)
             {
                 ConsoleKeyInfo keyInfo = Console.ReadKey(intercept: true);
+                //case loop
                 while (true)
                 {
-                    if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x + 1 && y_pos[0] == æble_y))                   // Her har jeg ændret - Mark
-                    {
-                        x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
-                        y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
-                        score = score + 100;                                        // Her har jeg ændret - Mark
+                    Spis(x_pos, y_pos, ref æble_x, ref æble_y, ref score, size, ref hastighed);
 
-                        //slet æble her
-                        Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
-                        Console.Write(" ");
-                        æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-                        æble_y = rand.Next(2, size/4);                               // Her har jeg ændret - Mark
-                    }
-                    for (int j = 0; j < x_pos.Count; j++)
-                    {
-                        Console.SetCursorPosition(x_pos[j], y_pos[j]);
-                        Console.Write(" ");
-                    }
+                    RemoveSnake(x_pos, y_pos);
                     if (!Alive(x_pos, y_pos, size, score))
                     {
                         return;
                     }
+                    //Muligheder for loopet: højre pil, venstre pil, op pil og ned pil. 
                     switch (keyInfo.Key)
                     {
+                        //Hvis højre pil bliver trykket så skal den gå ind i et nyt loop
                         case ConsoleKey.RightArrow:
+                            //Dette loop skal fortsætte bevægelsen
                             while (true)
                             {
                                 // Tjekker om der er trykket på en tast uden at blokere løkken
@@ -297,48 +304,27 @@ internal class Program
                                     ConsoleKeyInfo keyInfo1 = Console.ReadKey(intercept: true);
 
                                     // Hvis Q, Pil op eller Pil ned trykkes, brydes løkken
-                                    if (keyInfo1.Key == ConsoleKey.Q ||
-                                        keyInfo1.Key == ConsoleKey.UpArrow ||
-                                        keyInfo1.Key == ConsoleKey.DownArrow)
+                                    if (keyInfo1.Key == ConsoleKey.Q || keyInfo1.Key == ConsoleKey.UpArrow || keyInfo1.Key == ConsoleKey.DownArrow)
                                     {
                                         keyInfo = keyInfo1;  // Opdaterer keyInfo, så switch ved hvad der skal ske bagefter
                                         break;
                                     }
                                 }
                                 if (!Alive(x_pos, y_pos,size,score))
-                                {
                                     return;
-                                }
-
+                                                               
+                                Spis(x_pos, y_pos, ref æble_x,ref æble_y, ref score, size, ref hastighed);
                                 // Flytter og tegner, så længe der ikke er trykket en anden tast
                                 HØJRE(x_pos, y_pos);
 
-                                if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x + 1 && y_pos[0] == æble_y))                   // Her har jeg ændret - Mark
-                                {
-                                    x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
-                                    y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
-                                    score = score + 100;                                        // Her har jeg ændret - Mark
-
-                                    using (var soundPlayer = new SoundPlayer(@"C:\Users\victo\Downloads\smW_coin.wav"))
-                                    {
-                                        soundPlayer.Play(); // can also use soundPlayer.PlaySync()
-                                    }
-                                    
-                                    //slet æble her
-                                    Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
-                                    Console.Write(" ");
-                                    æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-                                    æble_y = rand.Next(2, size / 4);                             // Her har jeg ændret - Mark
-                                }
                                 TEGN(x_pos, y_pos, æble_x, æble_y, score);
                                 Thread.Sleep(hastighed);
-                                for (int i = 0; i < x_pos.Count; i++)
-                                {
-                                    Console.SetCursorPosition(x_pos[i], y_pos[i]);
-                                    Console.Write(" ");
-                                }
+
+                                RemoveSnake(x_pos, y_pos);
+
                             }
                             break;
+                        //Hvis venstre pil bliver trykket så skal den gå ind i et nyt loop
                         case ConsoleKey.LeftArrow:
                             while (true)
                             {
@@ -363,32 +349,15 @@ internal class Program
 
                                 // Flytter og tegner, så længe der ikke er trykket en anden tast
                                 VENSTRE(x_pos, y_pos);
-                                if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x+1 && y_pos[0] == æble_y))                   // Her har jeg ændret - Mark
-                                {
-                                    x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
-                                    y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
-                                    score = score + 100;
-                                    using (var soundPlayer = new SoundPlayer(@"C:\Users\victo\Downloads\smW_coin.wav"))
-                                    {
-                                        soundPlayer.Play(); // can also use soundPlayer.PlaySync()
-                                    }// Her har jeg ændret - Mark
-
-                                    //slet æble her
-                                    Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
-                                    Console.Write(" ");
-                                    æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-                                    æble_y = rand.Next(2, size / 4);                                   // Her har jeg ændret - Mark
-                                }
+                                Spis(x_pos, y_pos, ref æble_x, ref æble_y, ref score, size, ref hastighed);
                                 TEGN(x_pos, y_pos, æble_x, æble_y, score);
                                 
                                 Thread.Sleep(hastighed);
-                                for (int i = 0; i < x_pos.Count; i++)
-                                {
-                                    Console.SetCursorPosition(x_pos[i], y_pos[i]);
-                                    Console.Write(" ");
-                                }
+
+                                RemoveSnake(x_pos, y_pos);
                             }
                             break;
+                        //Hvis op pil bliver trykket så skal den gå ind i et nyt loop
                         case ConsoleKey.UpArrow:
                             while (true)
                             {
@@ -413,31 +382,15 @@ internal class Program
 
                                 // Flytter og tegner, så længe der ikke er trykket en anden tast
                                 OP(x_pos, y_pos);
-                                if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x + 1 && y_pos[0] == æble_y))                  // Her har jeg ændret - Mark
-                                {
-                                    x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
-                                    y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
-                                    score = score + 100;                                        // Her har jeg ændret - Mark
-                                    using (var soundPlayer = new SoundPlayer(@"C:\Users\victo\Downloads\smW_coin.wav"))
-                                    {
-                                        soundPlayer.Play(); // can also use soundPlayer.PlaySync()
-                                    }
-                                    //slet æble her
-                                    Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
-                                    Console.Write(" ");
-                                    æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-                                    æble_y = rand.Next(2, size / 4);                                   // Her har jeg ændret - Mark
-                                }
+                                Spis(x_pos, y_pos, ref æble_x, ref æble_y, ref score, size, ref hastighed);
                                 TEGN(x_pos, y_pos, æble_x, æble_y, score);
                                 
                                 Thread.Sleep(2*hastighed);
-                                for (int i = 0; i < x_pos.Count; i++)
-                                {
-                                    Console.SetCursorPosition(x_pos[i], y_pos[i]);
-                                    Console.Write(" ");
-                                }
+
+                                RemoveSnake(x_pos, y_pos);
                             }
                             break;
+                        //Hvis ned pil bliver trykket så skal den gå ind i et nyt loop
                         case ConsoleKey.DownArrow:
                             while (true)
                             {
@@ -463,30 +416,13 @@ internal class Program
                                 // Flytter og tegner, så længe der ikke er trykket en anden tast
                                 NED(x_pos, y_pos);
 
-                                if ((x_pos[0] == æble_x && y_pos[0] == æble_y) || (x_pos[0] == æble_x + 1 && y_pos[0] == æble_y))                   // Her har jeg ændret - Mark
-                                {
-                                    x_pos.Add(x_pos[x_pos.Count - 1]);                          // Her har jeg ændret - Mark
-                                    y_pos.Add(y_pos[y_pos.Count - 1]);                          // * Forlængelse af slangen
-                                    score = score + 100;                                        // Her har jeg ændret - Mark
-                                    using (var soundPlayer = new SoundPlayer(@"C:\Users\victo\Downloads\smW_coin.wav"))
-                                    {
-                                        soundPlayer.Play(); // can also use soundPlayer.PlaySync()
-                                    }
-                                    //slet æble her
-                                    Console.SetCursorPosition(æble_x, æble_y);                                  // Her har jeg ændret - Mark
-                                    Console.Write(" ");
-                                    æble_x = rand.Next(2, size);                                  // Her har jeg ændret - Mark
-                                    æble_y = rand.Next(2, size / 4);                                  // Her har jeg ændret - Mark
-                                }
+                                Spis(x_pos, y_pos, ref æble_x, ref æble_y, ref score, size, ref hastighed);
                                 TEGN(x_pos, y_pos, æble_x, æble_y, score);
                                 Thread.Sleep(2*hastighed);
-                                for (int i = 0; i < x_pos.Count; i++)
-                                {
-                                    Console.SetCursorPosition(x_pos[i], y_pos[i]);
-                                    Console.Write(" ");
-                                }
+                                RemoveSnake(x_pos, y_pos);
                             }
                             break;
+                        //hvis Q bliver trykket så stopper programet
                         case ConsoleKey.Q:
                             return;
                     }
