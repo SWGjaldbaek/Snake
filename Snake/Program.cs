@@ -219,7 +219,7 @@ internal class Program
         return true;    //Slangen er stadig i live hvis ingen dødsbetingelser er opfyldt. 
 
     }
-    //Mark + Victor
+    //Mark
     static void Spis(List<int> x_pos, List<int> y_pos, ref int æble_x, ref int æble_y, ref int score, int size, ref int hastighed)
     {
         Random rand = new Random();
