@@ -12,8 +12,8 @@ using System.Timers;
 
 internal class Program
 {
-
-    static void start(ref int size)
+    //Victor
+    static void start(ref int size) 
     {
         //Spørger brugeren om størrelsen på banen, og det bliver vi ved med indtil vi får et ordentligt svar.
         while (true)
@@ -49,6 +49,7 @@ internal class Program
         }
 
     }
+    //Victor
     static void TegnBane(int size)
     {
         Console.ForegroundColor = ConsoleColor.White;   //sikre farven er hvid
@@ -77,6 +78,7 @@ internal class Program
         Console.SetCursorPosition(size, 0);
         Console.WriteLine("\U0000231D");
     }
+    //Søren + Victor + Mark
     static void TEGN(List<int> x_pos, List<int> y_pos, int æble_x, int æble_y, int score)
     {
         Console.OutputEncoding = Encoding.UTF8;     //Benyttelse af Unicode karakterer
@@ -111,6 +113,7 @@ internal class Program
         Console.Write(apple);
         Console.ForegroundColor = ConsoleColor.White;
     }
+    //Søren
     static void VENSTRE(List<int> x_pos, List<int> y_pos)
     {
         if (y_pos == null || y_pos.Count == 0)
@@ -126,6 +129,7 @@ internal class Program
         // Fjern det sidste element
         y_pos.RemoveAt(y_pos.Count - 1);
     }
+    //Søren
     static void HØJRE(List<int> x_pos, List<int> y_pos)
     {
         if (y_pos == null || y_pos.Count == 0)
@@ -141,6 +145,7 @@ internal class Program
         // Fjern det sidste element
         y_pos.RemoveAt(y_pos.Count - 1);
     }
+    //Søren
     static void NED(List<int> x_pos, List<int> y_pos)
     {
         if (y_pos == null || y_pos.Count == 0)
@@ -157,6 +162,7 @@ internal class Program
         y_pos.RemoveAt(y_pos.Count - 1);
 
     }
+    //Søren
     static void OP(List<int> x_pos, List<int> y_pos)
     {
         if (y_pos == null || y_pos.Count == 0)
@@ -173,6 +179,7 @@ internal class Program
         y_pos.RemoveAt(y_pos.Count - 1);
 
     }
+    //Victor
     static bool Alive(List<int> x_pos, List<int> y_pos, int size, int score)
     {
         //Lyd når man dør
@@ -212,6 +219,7 @@ internal class Program
         return true;    //Slangen er stadig i live hvis ingen dødsbetingelser er opfyldt. 
 
     }
+    //Mark + Victor
     static void Spis(List<int> x_pos, List<int> y_pos, ref int æble_x, ref int æble_y, ref int score, int size, ref int hastighed)
     {
         Random rand = new Random();
@@ -259,6 +267,7 @@ internal class Program
 
         }
     }
+    //Mark Victor Søren
     static void RemoveSnake(List<int> x_pos, List<int> y_pos)
     {
         for (int i = 0; i < x_pos.Count; i++)
@@ -268,6 +277,7 @@ internal class Program
         }
     }
 
+    //Søren Mark Victor
     private static void Main(string[] args)
     {
         
